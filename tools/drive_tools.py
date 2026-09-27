@@ -61,16 +61,22 @@ def register_drive_tools(mcp) -> None:
             else:
                 q = "trashed = false"
 
-            results = service.files().list(
-                pageSize=min(limit, 100),
-                q=q,
-                orderBy=order_by,
-                fields="files(id, name, mimeType, modifiedTime, size, webViewLink, parents)",
-            ).execute()
+            results = (
+                service.files()
+                .list(
+                    pageSize=min(limit, 100),
+                    q=q,
+                    orderBy=order_by,
+                    fields="files(id, name, mimeType, modifiedTime, size, webViewLink, parents)",
+                )
+                .execute()
+            )
 
             files = results.get("files", [])
             if not files:
-                return f"📁 Brak plików na koncie '{account_id}'" + (f" w folderze {folder_id}" if folder_id else "")
+                return f"📁 Brak plików na koncie '{account_id}'" + (
+                    f" w folderze {folder_id}" if folder_id else ""
+                )
 
             lines = [f"📁 Konto: {account_id} | Pliki ({len(files)}):\n"]
             for f in files:
@@ -129,11 +135,15 @@ def register_drive_tools(mcp) -> None:
             if file_type and file_type in type_filters:
                 q_parts.append(type_filters[file_type])
 
-            results = service.files().list(
-                pageSize=min(limit, 100),
-                q=" and ".join(q_parts),
-                fields="files(id, name, mimeType, modifiedTime, webViewLink)",
-            ).execute()
+            results = (
+                service.files()
+                .list(
+                    pageSize=min(limit, 100),
+                    q=" and ".join(q_parts),
+                    fields="files(id, name, mimeType, modifiedTime, webViewLink)",
+                )
+                .execute()
+            )
 
             files = results.get("files", [])
             if not files:
@@ -166,11 +176,15 @@ def register_drive_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "drive", "v3")
-            f = service.files().get(
-                fileId=file_id,
-                fields="id, name, mimeType, size, createdTime, modifiedTime, "
-                       "owners, webViewLink, description, starred, shared",
-            ).execute()
+            f = (
+                service.files()
+                .get(
+                    fileId=file_id,
+                    fields="id, name, mimeType, size, createdTime, modifiedTime, "
+                    "owners, webViewLink, description, starred, shared",
+                )
+                .execute()
+            )
 
             size_str = _format_size(int(f["size"])) if f.get("size") else "—"
             owners = ", ".join(o.get("emailAddress", "?") for o in f.get("owners", []))
@@ -213,14 +227,18 @@ def register_drive_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "drive", "v3")
-            meta = service.files().get(fileId=file_id, fields="name, mimeType").execute()
+            meta = (
+                service.files().get(fileId=file_id, fields="name, mimeType").execute()
+            )
             mime = meta.get("mimeType", "")
             name = meta.get("name", file_id)
 
             # Google Docs/Sheets – eksport
             if mime in TEXT_MIME_TYPES:
                 export_mime = TEXT_MIME_TYPES[mime]
-                request = service.files().export_media(fileId=file_id, mimeType=export_mime)
+                request = service.files().export_media(
+                    fileId=file_id, mimeType=export_mime
+                )
             else:
                 # Zwykły plik binarny/tekstowy
                 request = service.files().get_media(fileId=file_id)
@@ -236,7 +254,11 @@ def register_drive_tools(mcp) -> None:
             preview = content[:5000]
 
             header = f"📄 {name}\n{'─' * 40}\n"
-            footer = "\n\n⚠️ [Wyświetlono pierwsze 5000 znaków z większego pliku]" if truncated else ""
+            footer = (
+                "\n\n⚠️ [Wyświetlono pierwsze 5000 znaków z większego pliku]"
+                if truncated
+                else ""
+            )
             return header + preview + footer
 
         except Exception as e:
@@ -259,15 +281,22 @@ def register_drive_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "drive", "v3")
-            q_parts = ["mimeType = 'application/vnd.google-apps.folder'", "trashed = false"]
+            q_parts = [
+                "mimeType = 'application/vnd.google-apps.folder'",
+                "trashed = false",
+            ]
             if parent_id:
                 q_parts.append(f"'{parent_id}' in parents")
 
-            results = service.files().list(
-                q=" and ".join(q_parts),
-                orderBy="name",
-                fields="files(id, name, modifiedTime)",
-            ).execute()
+            results = (
+                service.files()
+                .list(
+                    q=" and ".join(q_parts),
+                    orderBy="name",
+                    fields="files(id, name, modifiedTime)",
+                )
+                .execute()
+            )
 
             folders = results.get("files", [])
             if not folders:
@@ -310,7 +339,11 @@ def register_drive_tools(mcp) -> None:
             if parent_id:
                 meta["parents"] = [parent_id]
 
-            created = service.files().create(body=meta, fields="id, name, webViewLink").execute()
+            created = (
+                service.files()
+                .create(body=meta, fields="id, name, webViewLink")
+                .execute()
+            )
             return (
                 f"✅ Utworzono folder na Google Drive!\n"
                 f"   Nazwa: {created['name']}\n"
@@ -349,12 +382,18 @@ def register_drive_tools(mcp) -> None:
             if parent_id:
                 meta["parents"] = [parent_id]
 
-            media = MediaInMemoryUpload(content.encode("utf-8"), mimetype=mime_type, resumable=False)
-            uploaded = service.files().create(
-                body=meta,
-                media_body=media,
-                fields="id, name, webViewLink, size",
-            ).execute()
+            media = MediaInMemoryUpload(
+                content.encode("utf-8"), mimetype=mime_type, resumable=False
+            )
+            uploaded = (
+                service.files()
+                .create(
+                    body=meta,
+                    media_body=media,
+                    fields="id, name, webViewLink, size",
+                )
+                .execute()
+            )
 
             link = uploaded.get("webViewLink", "")
             return (
@@ -388,11 +427,15 @@ def register_drive_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "drive", "v3")
-            updated = service.files().update(
-                fileId=file_id,
-                body={"name": new_name},
-                fields="id, name",
-            ).execute()
+            updated = (
+                service.files()
+                .update(
+                    fileId=file_id,
+                    body={"name": new_name},
+                    fields="id, name",
+                )
+                .execute()
+            )
             return f"✅ Nazwa zmieniona na: '{updated['name']}' (ID: {file_id})."
         except Exception as e:
             logger.error(f"drive_rename_file [{account_id}/{file_id}]: {e}")
@@ -418,7 +461,9 @@ def register_drive_tools(mcp) -> None:
         try:
             service = get_google_service(account_id, "drive", "v3")
             service.files().update(fileId=file_id, body={"trashed": True}).execute()
-            return f"🗑️ Plik/folder {file_id} został przeniesiony do kosza Google Drive."
+            return (
+                f"🗑️ Plik/folder {file_id} został przeniesiony do kosza Google Drive."
+            )
         except Exception as e:
             logger.error(f"drive_trash_file [{account_id}/{file_id}]: {e}")
             return f"❌ Błąd przenoszenia do kosza ({account_id}): {str(e)}"
@@ -443,13 +488,16 @@ def register_drive_tools(mcp) -> None:
         try:
             service = get_google_service(account_id, "drive", "v3")
             service.files().delete(fileId=file_id).execute()
-            return f"⚠️ Plik/folder {file_id} został bezpowrotnie usunięty z Google Drive."
+            return (
+                f"⚠️ Plik/folder {file_id} został bezpowrotnie usunięty z Google Drive."
+            )
         except Exception as e:
             logger.error(f"drive_delete_file [{account_id}/{file_id}]: {e}")
             return f"❌ Błąd trwałego usuwania ({account_id}): {str(e)}"
 
 
 # ── Pomocnicze funkcje ────────────────────────────────────────────────────────
+
 
 def _format_size(size_bytes: int) -> str:
     """Formatuje rozmiar pliku w czytelny sposób."""

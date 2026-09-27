@@ -99,6 +99,7 @@ logger.info(f"Inicjalizacja {MCP_SERVER_NAME} v{MCP_SERVER_VERSION}")
 # Narzędzia systemowe (zarządzanie kontami)
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 @mcp.tool()
 def list_accounts() -> str:
     """

@@ -39,6 +39,7 @@ GEMINI_MODEL = "gemini-2.5-pro"
 # Sprawdzenie konfiguracji
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def check_config() -> bool:
     """Sprawdza poprawność konfiguracji przed uruchomieniem."""
     ok = True
@@ -69,6 +70,7 @@ def check_config() -> bool:
 # ─────────────────────────────────────────────────────────────────────────────
 # Klient Gemini z MCP
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 async def run_interactive_chat():
     """Uruchamia interaktywny czat z Gemini + narzędziami Google."""
@@ -131,10 +133,7 @@ Odpowiadaj po polsku."""
             if not user_input:
                 continue
 
-            history.append({
-                "role": "user",
-                "parts": [{"text": user_input}]
-            })
+            history.append({"role": "user", "parts": [{"text": user_input}]})
 
             try:
                 response = await client.aio.models.generate_content(
@@ -153,10 +152,7 @@ Odpowiadaj po polsku."""
                 print(f"\nGemini: {response_text}\n")
 
                 # Dodaj odpowiedź do historii
-                history.append({
-                    "role": "model",
-                    "parts": [{"text": response_text}]
-                })
+                history.append({"role": "model", "parts": [{"text": response_text}]})
 
             except Exception as e:
                 print(f"\n❌ Błąd Gemini API: {e}\n")
@@ -200,6 +196,7 @@ async def run_single_query(query: str) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 # Przykłady użycia biblioteki (do importu z innych skryptów)
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 async def example_check_emails(account_id: str = "praca") -> str:
     """Przykład: sprawdzenie maili przez Gemini."""

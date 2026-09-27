@@ -69,9 +69,13 @@ def register_calendar_tools(mcp) -> None:
             events = events_result.get("items", [])
 
             if not events:
-                return f"📅 Brak wydarzeń na koncie '{account_id}' w podanym zakresie dat."
+                return (
+                    f"📅 Brak wydarzeń na koncie '{account_id}' w podanym zakresie dat."
+                )
 
-            lines = [f"📅 Konto: {account_id} | Kalendarz: {calendar_id} | {len(events)} wydarzeń:\n"]
+            lines = [
+                f"📅 Konto: {account_id} | Kalendarz: {calendar_id} | {len(events)} wydarzeń:\n"
+            ]
             for event in events:
                 start = event["start"].get("dateTime", event["start"].get("date", "?"))
                 end = event["end"].get("dateTime", event["end"].get("date", "?"))
@@ -80,7 +84,11 @@ def register_calendar_tools(mcp) -> None:
                 attendees = event.get("attendees", [])
                 status = event.get("status", "confirmed")
 
-                status_icon = {"confirmed": "✅", "tentative": "❓", "cancelled": "❌"}.get(status, "📌")
+                status_icon = {
+                    "confirmed": "✅",
+                    "tentative": "❓",
+                    "cancelled": "❌",
+                }.get(status, "📌")
                 loc_str = f"\n   📍 {location}" if location else ""
                 att_str = f"\n   👥 {len(attendees)} uczestników" if attendees else ""
 
@@ -116,9 +124,9 @@ def register_calendar_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "calendar", "v3")
-            event = service.events().get(
-                calendarId=calendar_id, eventId=event_id
-            ).execute()
+            event = (
+                service.events().get(calendarId=calendar_id, eventId=event_id).execute()
+            )
 
             start = event["start"].get("dateTime", event["start"].get("date", "?"))
             end = event["end"].get("dateTime", event["end"].get("date", "?"))
@@ -202,7 +210,11 @@ def register_calendar_tools(mcp) -> None:
                     "createRequest": {"requestId": f"mcp-{datetime.now().timestamp()}"}
                 }
 
-            kwargs = {"calendarId": calendar_id, "body": event_body, "sendUpdates": "all"}
+            kwargs = {
+                "calendarId": calendar_id,
+                "body": event_body,
+                "sendUpdates": "all",
+            }
             if add_google_meet:
                 kwargs["conferenceDataVersion"] = 1
 
@@ -286,7 +298,9 @@ def register_calendar_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "calendar", "v3")
-            event = service.events().get(calendarId=calendar_id, eventId=event_id).execute()
+            event = (
+                service.events().get(calendarId=calendar_id, eventId=event_id).execute()
+            )
 
             if title:
                 event["summary"] = title
@@ -295,18 +309,32 @@ def register_calendar_tools(mcp) -> None:
             if location:
                 event["location"] = location
             if start_datetime:
-                event["start"] = {"dateTime": start_datetime} if "T" in start_datetime else {"date": start_datetime}
+                event["start"] = (
+                    {"dateTime": start_datetime}
+                    if "T" in start_datetime
+                    else {"date": start_datetime}
+                )
             if end_datetime:
-                event["end"] = {"dateTime": end_datetime} if "T" in end_datetime else {"date": end_datetime}
+                event["end"] = (
+                    {"dateTime": end_datetime}
+                    if "T" in end_datetime
+                    else {"date": end_datetime}
+                )
             if attendees:
-                event["attendees"] = [{"email": e.strip()} for e in attendees.split(",") if e.strip()]
+                event["attendees"] = [
+                    {"email": e.strip()} for e in attendees.split(",") if e.strip()
+                ]
 
-            updated = service.events().update(
-                calendarId=calendar_id,
-                eventId=event_id,
-                body=event,
-                sendUpdates="all" if attendees else "none",
-            ).execute()
+            updated = (
+                service.events()
+                .update(
+                    calendarId=calendar_id,
+                    eventId=event_id,
+                    body=event,
+                    sendUpdates="all" if attendees else "none",
+                )
+                .execute()
+            )
 
             link = updated.get("htmlLink", "")
             return (
@@ -354,6 +382,7 @@ def register_calendar_tools(mcp) -> None:
 
 
 # ── Pomocnicze funkcje ────────────────────────────────────────────────────────
+
 
 def _format_datetime(dt_str: str) -> str:
     """Formatuje datę ISO do czytelnej postaci."""

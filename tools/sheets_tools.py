@@ -44,11 +44,16 @@ def register_sheets_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "sheets", "v4")
-            result = service.spreadsheets().values().get(
-                spreadsheetId=spreadsheet_id,
-                range=range_name,
-                valueRenderOption=value_render,
-            ).execute()
+            result = (
+                service.spreadsheets()
+                .values()
+                .get(
+                    spreadsheetId=spreadsheet_id,
+                    range=range_name,
+                    valueRenderOption=value_render,
+                )
+                .execute()
+            )
 
             rows = result.get("values", [])
             if not rows:
@@ -57,11 +62,15 @@ def register_sheets_tools(mcp) -> None:
             # Wyrównaj szerokości kolumn
             max_cols = max(len(row) for row in rows)
             padded = [row + [""] * (max_cols - len(row)) for row in rows]
-            col_widths = [max(len(str(row[i])) for row in padded) for i in range(max_cols)]
+            col_widths = [
+                max(len(str(row[i])) for row in padded) for i in range(max_cols)
+            ]
 
             lines = [f"📊 {spreadsheet_id} | {range_name} ({len(rows)} wierszy):\n"]
             for i, row in enumerate(padded):
-                formatted = " | ".join(str(cell).ljust(col_widths[j]) for j, cell in enumerate(row))
+                formatted = " | ".join(
+                    str(cell).ljust(col_widths[j]) for j, cell in enumerate(row)
+                )
                 if i == 0:
                     lines.append(formatted)
                     lines.append("─" * len(formatted))
@@ -97,12 +106,17 @@ def register_sheets_tools(mcp) -> None:
         try:
             service = get_google_service(account_id, "sheets", "v4")
             body = {"values": values}
-            result = service.spreadsheets().values().update(
-                spreadsheetId=spreadsheet_id,
-                range=range_name,
-                valueInputOption="USER_ENTERED",
-                body=body,
-            ).execute()
+            result = (
+                service.spreadsheets()
+                .values()
+                .update(
+                    spreadsheetId=spreadsheet_id,
+                    range=range_name,
+                    valueInputOption="USER_ENTERED",
+                    body=body,
+                )
+                .execute()
+            )
 
             updated_cells = result.get("updatedCells", 0)
             return (
@@ -138,13 +152,18 @@ def register_sheets_tools(mcp) -> None:
         try:
             service = get_google_service(account_id, "sheets", "v4")
             body = {"values": [values]}
-            result = service.spreadsheets().values().append(
-                spreadsheetId=spreadsheet_id,
-                range=range_name,
-                valueInputOption="USER_ENTERED",
-                insertDataOption="INSERT_ROWS",
-                body=body,
-            ).execute()
+            result = (
+                service.spreadsheets()
+                .values()
+                .append(
+                    spreadsheetId=spreadsheet_id,
+                    range=range_name,
+                    valueInputOption="USER_ENTERED",
+                    insertDataOption="INSERT_ROWS",
+                    body=body,
+                )
+                .execute()
+            )
 
             table_range = result.get("updates", {}).get("updatedRange", "?")
             return (
@@ -172,15 +191,21 @@ def register_sheets_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "sheets", "v4")
-            spreadsheet = service.spreadsheets().get(
-                spreadsheetId=spreadsheet_id,
-                fields="properties.title,sheets.properties",
-            ).execute()
+            spreadsheet = (
+                service.spreadsheets()
+                .get(
+                    spreadsheetId=spreadsheet_id,
+                    fields="properties.title,sheets.properties",
+                )
+                .execute()
+            )
 
             title = spreadsheet.get("properties", {}).get("title", "Nieznany")
             sheets = spreadsheet.get("sheets", [])
 
-            lines = [f"📊 Plik: {title} ({spreadsheet_id})\n   Zakładki ({len(sheets)}):\n"]
+            lines = [
+                f"📊 Plik: {title} ({spreadsheet_id})\n   Zakładki ({len(sheets)}):\n"
+            ]
             for sheet in sheets:
                 props = sheet["properties"]
                 grid = props.get("gridProperties", {})
@@ -218,14 +243,20 @@ def register_sheets_tools(mcp) -> None:
         try:
             service = get_google_service(account_id, "sheets", "v4")
 
-            sheets_config = [{"properties": {"title": name}} for name in (sheet_names or ["Arkusz1"])]
+            sheets_config = [
+                {"properties": {"title": name}} for name in (sheet_names or ["Arkusz1"])
+            ]
 
-            spreadsheet = service.spreadsheets().create(
-                body={
-                    "properties": {"title": title},
-                    "sheets": sheets_config,
-                }
-            ).execute()
+            spreadsheet = (
+                service.spreadsheets()
+                .create(
+                    body={
+                        "properties": {"title": title},
+                        "sheets": sheets_config,
+                    }
+                )
+                .execute()
+            )
 
             spreadsheet_id = spreadsheet["spreadsheetId"]
             link = f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}"
@@ -292,20 +323,16 @@ def register_sheets_tools(mcp) -> None:
         try:
             service = get_google_service(account_id, "sheets", "v4")
             request_body = {
-                "requests": [
-                    {
-                        "addSheet": {
-                            "properties": {
-                                "title": title
-                            }
-                        }
-                    }
-                ]
+                "requests": [{"addSheet": {"properties": {"title": title}}}]
             }
-            res = service.spreadsheets().batchUpdate(
-                spreadsheetId=spreadsheet_id,
-                body=request_body,
-            ).execute()
+            res = (
+                service.spreadsheets()
+                .batchUpdate(
+                    spreadsheetId=spreadsheet_id,
+                    body=request_body,
+                )
+                .execute()
+            )
             new_sheet_id = res["replies"][0]["addSheet"]["properties"]["sheetId"]
             return f"✅ Dodano zakładkę '{title}' (ID zakładki: {new_sheet_id}) do arkusza {spreadsheet_id}."
         except Exception as e:
@@ -333,15 +360,7 @@ def register_sheets_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "sheets", "v4")
-            request_body = {
-                "requests": [
-                    {
-                        "deleteSheet": {
-                            "sheetId": sheet_id
-                        }
-                    }
-                ]
-            }
+            request_body = {"requests": [{"deleteSheet": {"sheetId": sheet_id}}]}
             service.spreadsheets().batchUpdate(
                 spreadsheetId=spreadsheet_id,
                 body=request_body,

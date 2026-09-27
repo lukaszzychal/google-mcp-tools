@@ -32,10 +32,14 @@ def register_youtube_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "youtube", "v3")
-            response = service.channels().list(
-                part="snippet,statistics,brandingSettings",
-                mine=True,
-            ).execute()
+            response = (
+                service.channels()
+                .list(
+                    part="snippet,statistics,brandingSettings",
+                    mine=True,
+                )
+                .execute()
+            )
 
             channels = response.get("items", [])
             if not channels:
@@ -91,13 +95,17 @@ def register_youtube_tools(mcp) -> None:
             channel_id = channels[0]["id"]
 
             # Pobierz filmy
-            search_response = service.search().list(
-                part="id,snippet",
-                channelId=channel_id,
-                type="video",
-                order=order,
-                maxResults=min(limit, 50),
-            ).execute()
+            search_response = (
+                service.search()
+                .list(
+                    part="id,snippet",
+                    channelId=channel_id,
+                    type="video",
+                    order=order,
+                    maxResults=min(limit, 50),
+                )
+                .execute()
+            )
 
             items = search_response.get("items", [])
             if not items:
@@ -105,10 +113,14 @@ def register_youtube_tools(mcp) -> None:
 
             # Pobierz statystyki dla wszystkich filmów naraz
             video_ids = [i["id"]["videoId"] for i in items]
-            stats_response = service.videos().list(
-                part="statistics,contentDetails",
-                id=",".join(video_ids),
-            ).execute()
+            stats_response = (
+                service.videos()
+                .list(
+                    part="statistics,contentDetails",
+                    id=",".join(video_ids),
+                )
+                .execute()
+            )
             stats_map = {v["id"]: v for v in stats_response.get("items", [])}
 
             lines = [f"📺 Filmy na kanale '{account_id}' ({len(items)}):\n"]
@@ -147,10 +159,14 @@ def register_youtube_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "youtube", "v3")
-            response = service.videos().list(
-                part="snippet,statistics,contentDetails",
-                id=video_id,
-            ).execute()
+            response = (
+                service.videos()
+                .list(
+                    part="snippet,statistics,contentDetails",
+                    id=video_id,
+                )
+                .execute()
+            )
 
             items = response.get("items", [])
             if not items:
@@ -202,13 +218,17 @@ def register_youtube_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "youtube", "v3")
-            response = service.search().list(
-                part="id,snippet",
-                q=query,
-                type="video",
-                order=order,
-                maxResults=min(limit, 50),
-            ).execute()
+            response = (
+                service.search()
+                .list(
+                    part="id,snippet",
+                    q=query,
+                    type="video",
+                    order=order,
+                    maxResults=min(limit, 50),
+                )
+                .execute()
+            )
 
             items = response.get("items", [])
             if not items:
@@ -233,6 +253,7 @@ def register_youtube_tools(mcp) -> None:
 
 # ── Pomocnicze funkcje ────────────────────────────────────────────────────────
 
+
 def _fmt_num(value) -> str:
     """Formatuje dużą liczbę z separatorem tysięcy."""
     try:
@@ -244,6 +265,7 @@ def _fmt_num(value) -> str:
 def _parse_duration(iso_duration: str) -> str:
     """Konwertuje czas ISO 8601 (PT1H2M3S) na czytelny format HH:MM:SS."""
     import re
+
     pattern = r"PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?"
     match = re.match(pattern, iso_duration)
     if not match:

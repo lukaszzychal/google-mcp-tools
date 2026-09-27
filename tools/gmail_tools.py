@@ -50,30 +50,44 @@ def register_gmail_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "gmail", "v1")
-            result = service.users().messages().list(
-                userId="me",
-                maxResults=min(limit, 50),
-                q=query,
-            ).execute()
+            result = (
+                service.users()
+                .messages()
+                .list(
+                    userId="me",
+                    maxResults=min(limit, 50),
+                    q=query,
+                )
+                .execute()
+            )
 
             messages = result.get("messages", [])
             if not messages:
                 q_info = f" dla zapytania '{query}'" if query else ""
                 return f"📭 Brak maili{q_info} na koncie '{account_id}'."
 
-            output_lines = [f"📬 Konto: {account_id} | Znaleziono: {len(messages)} maili\n"]
+            output_lines = [
+                f"📬 Konto: {account_id} | Znaleziono: {len(messages)} maili\n"
+            ]
             for msg_ref in messages:
-                msg = service.users().messages().get(
-                    userId="me",
-                    id=msg_ref["id"],
-                    format="metadata",
-                    metadataHeaders=["From", "To", "Subject", "Date"],
-                ).execute()
+                msg = (
+                    service.users()
+                    .messages()
+                    .get(
+                        userId="me",
+                        id=msg_ref["id"],
+                        format="metadata",
+                        metadataHeaders=["From", "To", "Subject", "Date"],
+                    )
+                    .execute()
+                )
 
                 headers = {h["name"]: h["value"] for h in msg["payload"]["headers"]}
                 labels = msg.get("labelIds", [])
                 unread = "🔴 " if "UNREAD" in labels else "   "
-                snippet = f"\n   💬 {msg.get('snippet', '')[:120]}..." if include_body else ""
+                snippet = (
+                    f"\n   💬 {msg.get('snippet', '')[:120]}..." if include_body else ""
+                )
 
                 output_lines.append(
                     f"{unread}📧 Od: {headers.get('From', 'N/A')}\n"
@@ -103,11 +117,16 @@ def register_gmail_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "gmail", "v1")
-            msg = service.users().messages().get(
-                userId="me",
-                id=message_id,
-                format="full",
-            ).execute()
+            msg = (
+                service.users()
+                .messages()
+                .get(
+                    userId="me",
+                    id=message_id,
+                    format="full",
+                )
+                .execute()
+            )
 
             headers = {h["name"]: h["value"] for h in msg["payload"]["headers"]}
             body = _extract_body(msg["payload"])
@@ -166,16 +185,25 @@ def register_gmail_tools(mcp) -> None:
 
             # Dołącz do wątku jeśli odpowiedź
             if reply_to_id:
-                orig = service.users().messages().get(
-                    userId="me", id=reply_to_id, format="metadata",
-                    metadataHeaders=["Message-Id", "References"]
-                ).execute()
-                orig_headers = {h["name"]: h["value"] for h in orig["payload"]["headers"]}
+                orig = (
+                    service.users()
+                    .messages()
+                    .get(
+                        userId="me",
+                        id=reply_to_id,
+                        format="metadata",
+                        metadataHeaders=["Message-Id", "References"],
+                    )
+                    .execute()
+                )
+                orig_headers = {
+                    h["name"]: h["value"] for h in orig["payload"]["headers"]
+                }
                 send_body["threadId"] = orig.get("threadId")
 
-            sent = service.users().messages().send(
-                userId="me", body=send_body
-            ).execute()
+            sent = (
+                service.users().messages().send(userId="me", body=send_body).execute()
+            )
 
             return f"✅ Wiadomość wysłana pomyślnie!\n   ID: {sent['id']}\n   Do: {to}"
         except Exception as e:
@@ -307,10 +335,15 @@ def register_gmail_tools(mcp) -> None:
             message["subject"] = subject
 
             raw = base64.urlsafe_b64encode(message.as_bytes()).decode()
-            draft = service.users().drafts().create(
-                userId="me",
-                body={"message": {"raw": raw}},
-            ).execute()
+            draft = (
+                service.users()
+                .drafts()
+                .create(
+                    userId="me",
+                    body={"message": {"raw": raw}},
+                )
+                .execute()
+            )
 
             return f"📝 Utworzono wersję roboczą (Draft)!\n   ID: {draft['id']}\n   Do: {to}\n   Temat: {subject}"
         except Exception as e:
@@ -320,12 +353,15 @@ def register_gmail_tools(mcp) -> None:
 
 # ── Pomocnicze funkcje (nie są narzędziami MCP) ───────────────────────────────
 
+
 def _extract_body(payload: dict) -> str:
     """Rekurencyjnie wydobywa tekst z ładunku wiadomości Gmail."""
     if payload.get("mimeType") == "text/plain":
         data = payload.get("body", {}).get("data", "")
         if data:
-            return base64.urlsafe_b64decode(data + "==").decode("utf-8", errors="replace")
+            return base64.urlsafe_b64decode(data + "==").decode(
+                "utf-8", errors="replace"
+            )
 
     for part in payload.get("parts", []):
         result = _extract_body(part)

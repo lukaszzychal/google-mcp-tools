@@ -77,17 +77,27 @@ def register_adsense_tools(mcp) -> None:
             end_date = date.today()
             start_date = end_date - timedelta(days=days)
 
-            report = service.accounts().reports().generate(
-                account=account_name,
-                dateRange="CUSTOM",
-                startDate_year=start_date.year,
-                startDate_month=start_date.month,
-                startDate_day=start_date.day,
-                endDate_year=end_date.year,
-                endDate_month=end_date.month,
-                endDate_day=end_date.day,
-                metrics=["ESTIMATED_EARNINGS", "PAGE_VIEWS", "CLICKS", "PAGE_VIEWS_RPM"],
-            ).execute()
+            report = (
+                service.accounts()
+                .reports()
+                .generate(
+                    account=account_name,
+                    dateRange="CUSTOM",
+                    startDate_year=start_date.year,
+                    startDate_month=start_date.month,
+                    startDate_day=start_date.day,
+                    endDate_year=end_date.year,
+                    endDate_month=end_date.month,
+                    endDate_day=end_date.day,
+                    metrics=[
+                        "ESTIMATED_EARNINGS",
+                        "PAGE_VIEWS",
+                        "CLICKS",
+                        "PAGE_VIEWS_RPM",
+                    ],
+                )
+                .execute()
+            )
 
             totals = report.get("totals", {}).get("cells", [])
             if not totals:
@@ -104,7 +114,9 @@ def register_adsense_tools(mcp) -> None:
                 f"Wyświetlenia: {pageviews:,}\n"
                 f"Kliknięcia:   {clicks:,}\n"
                 f"RPM strony:   {rpm:.2f} {currency}\n"
-                f"CTR:          {(clicks/pageviews*100):.3f}%" if pageviews > 0 else ""
+                f"CTR:          {(clicks/pageviews*100):.3f}%"
+                if pageviews > 0
+                else ""
             )
         except Exception as e:
             logger.error(f"adsense_earnings [{account_id}]: {e}")
@@ -133,19 +145,24 @@ def register_adsense_tools(mcp) -> None:
             end_date = date.today()
             start_date = end_date - timedelta(days=days)
 
-            report = service.accounts().reports().generate(
-                account=account_name,
-                dateRange="CUSTOM",
-                startDate_year=start_date.year,
-                startDate_month=start_date.month,
-                startDate_day=start_date.day,
-                endDate_year=end_date.year,
-                endDate_month=end_date.month,
-                endDate_day=end_date.day,
-                dimensions=["DOMAIN_NAME"],
-                metrics=["ESTIMATED_EARNINGS", "PAGE_VIEWS"],
-                orderBy=["-ESTIMATED_EARNINGS"],
-            ).execute()
+            report = (
+                service.accounts()
+                .reports()
+                .generate(
+                    account=account_name,
+                    dateRange="CUSTOM",
+                    startDate_year=start_date.year,
+                    startDate_month=start_date.month,
+                    startDate_day=start_date.day,
+                    endDate_year=end_date.year,
+                    endDate_month=end_date.month,
+                    endDate_day=end_date.day,
+                    dimensions=["DOMAIN_NAME"],
+                    metrics=["ESTIMATED_EARNINGS", "PAGE_VIEWS"],
+                    orderBy=["-ESTIMATED_EARNINGS"],
+                )
+                .execute()
+            )
 
             rows = report.get("rows", [])
             if not rows:
@@ -156,7 +173,9 @@ def register_adsense_tools(mcp) -> None:
                 cells = row.get("cells", [])
                 domain = cells[0].get("value", "?") if len(cells) > 0 else "?"
                 earnings = float(cells[1].get("value", 0)) if len(cells) > 1 else 0
-                pageviews = int(float(cells[2].get("value", 0))) if len(cells) > 2 else 0
+                pageviews = (
+                    int(float(cells[2].get("value", 0))) if len(cells) > 2 else 0
+                )
                 lines.append(
                     f"  {i:2}. {domain}\n"
                     f"       Przychody: {earnings:.2f} | Wyświetlenia: {pageviews:,}"

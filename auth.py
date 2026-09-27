@@ -81,7 +81,9 @@ def get_google_service(account_id: str, service_name: str, version: str):
                 creds = None
 
         if not creds or not creds.valid:
-            logger.info(f"Otwieram przeglądarkę – logowanie dla konta '{account_id}'...")
+            logger.info(
+                f"Otwieram przeglądarkę – logowanie dla konta '{account_id}'..."
+            )
             flow = InstalledAppFlow.from_client_secrets_file(
                 str(CREDENTIALS_FILE), SCOPES
             )
@@ -107,8 +109,7 @@ def list_available_accounts() -> list[str]:
     if not CREDENTIALS_DIR.exists():
         return []
     return sorted(
-        f.stem.replace("token_", "")
-        for f in CREDENTIALS_DIR.glob("token_*.json")
+        f.stem.replace("token_", "") for f in CREDENTIALS_DIR.glob("token_*.json")
     )
 
 
@@ -165,4 +166,3 @@ if __name__ == "__main__":
         print("  python auth.py list              - lista kont")
         print("  python auth.py add <nazwa_konta>  - dodanie/zalogowanie konta")
         print("  python auth.py revoke <nazwa_konta> - wylogowanie konta")
-

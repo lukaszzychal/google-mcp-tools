@@ -27,32 +27,25 @@ CREDENTIALS_FILE = CREDENTIALS_DIR / "credentials.json"
 
 SCOPES = [
     # ── Gmail ────────────────────────────────────────────────────────────────
-    "https://www.googleapis.com/auth/gmail.readonly",       # Odczyt maili
-    "https://www.googleapis.com/auth/gmail.send",           # Wysyłanie maili
-    "https://www.googleapis.com/auth/gmail.modify",         # Oznaczanie, archiwizacja
-
+    "https://www.googleapis.com/auth/gmail.readonly",  # Odczyt maili
+    "https://www.googleapis.com/auth/gmail.send",  # Wysyłanie maili
+    "https://www.googleapis.com/auth/gmail.modify",  # Oznaczanie, archiwizacja
     # ── Google Drive ─────────────────────────────────────────────────────────
-    "https://www.googleapis.com/auth/drive",                # Pełny dostęp (odczyt, tworzenie, edycja, usuwanie)
-
+    "https://www.googleapis.com/auth/drive",  # Pełny dostęp (odczyt, tworzenie, edycja, usuwanie)
     # ── Google Calendar ──────────────────────────────────────────────────────
-    "https://www.googleapis.com/auth/calendar",             # Pełny dostęp (odczyt, tworzenie, edycja, usuwanie)
-
+    "https://www.googleapis.com/auth/calendar",  # Pełny dostęp (odczyt, tworzenie, edycja, usuwanie)
     # ── YouTube ──────────────────────────────────────────────────────────────
-    "https://www.googleapis.com/auth/youtube.readonly",     # Dane kanału i filmów
-    "https://www.googleapis.com/auth/yt-analytics.readonly",# Analytics YouTube
-
+    "https://www.googleapis.com/auth/youtube.readonly",  # Dane kanału i filmów
+    "https://www.googleapis.com/auth/yt-analytics.readonly",  # Analytics YouTube
     # ── Google Sheets ────────────────────────────────────────────────────────
-    "https://www.googleapis.com/auth/spreadsheets",         # Odczyt + zapis arkuszy
-
+    "https://www.googleapis.com/auth/spreadsheets",  # Odczyt + zapis arkuszy
     # ── Google Analytics ─────────────────────────────────────────────────────
-    "https://www.googleapis.com/auth/analytics.readonly",   # Statystyki stron
-
+    "https://www.googleapis.com/auth/analytics.readonly",  # Statystyki stron
     # ── Google AdSense ───────────────────────────────────────────────────────
-    "https://www.googleapis.com/auth/adsense.readonly",     # Przychody reklam
-
+    "https://www.googleapis.com/auth/adsense.readonly",  # Przychody reklam
     # ── Google Fitness ───────────────────────────────────────────────────────
-    "https://www.googleapis.com/auth/fitness.activity.read",# Aktywność fizyczna
-    "https://www.googleapis.com/auth/fitness.sleep.read",   # Dane snu
+    "https://www.googleapis.com/auth/fitness.activity.read",  # Aktywność fizyczna
+    "https://www.googleapis.com/auth/fitness.sleep.read",  # Dane snu
 ]
 
 # ─────────────────────────────────────────────────────────────────────────────

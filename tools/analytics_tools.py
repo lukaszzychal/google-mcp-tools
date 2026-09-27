@@ -35,19 +35,25 @@ def register_analytics_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "analyticsdata", "v1beta")
-            response = service.properties().runReport(
-                property=f"properties/{property_id}",
-                body={
-                    "dateRanges": [{"startDate": f"{days}daysAgo", "endDate": "today"}],
-                    "metrics": [
-                        {"name": "sessions"},
-                        {"name": "activeUsers"},
-                        {"name": "screenPageViews"},
-                        {"name": "bounceRate"},
-                        {"name": "averageSessionDuration"},
-                    ],
-                },
-            ).execute()
+            response = (
+                service.properties()
+                .runReport(
+                    property=f"properties/{property_id}",
+                    body={
+                        "dateRanges": [
+                            {"startDate": f"{days}daysAgo", "endDate": "today"}
+                        ],
+                        "metrics": [
+                            {"name": "sessions"},
+                            {"name": "activeUsers"},
+                            {"name": "screenPageViews"},
+                            {"name": "bounceRate"},
+                            {"name": "averageSessionDuration"},
+                        ],
+                    },
+                )
+                .execute()
+            )
 
             rows = response.get("rows", [])
             if not rows:
@@ -97,16 +103,27 @@ def register_analytics_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "analyticsdata", "v1beta")
-            response = service.properties().runReport(
-                property=f"properties/{property_id}",
-                body={
-                    "dateRanges": [{"startDate": f"{days}daysAgo", "endDate": "today"}],
-                    "dimensions": [{"name": "pagePath"}],
-                    "metrics": [{"name": "screenPageViews"}, {"name": "activeUsers"}],
-                    "orderBys": [{"metric": {"metricName": "screenPageViews"}, "desc": True}],
-                    "limit": limit,
-                },
-            ).execute()
+            response = (
+                service.properties()
+                .runReport(
+                    property=f"properties/{property_id}",
+                    body={
+                        "dateRanges": [
+                            {"startDate": f"{days}daysAgo", "endDate": "today"}
+                        ],
+                        "dimensions": [{"name": "pagePath"}],
+                        "metrics": [
+                            {"name": "screenPageViews"},
+                            {"name": "activeUsers"},
+                        ],
+                        "orderBys": [
+                            {"metric": {"metricName": "screenPageViews"}, "desc": True}
+                        ],
+                        "limit": limit,
+                    },
+                )
+                .execute()
+            )
 
             rows = response.get("rows", [])
             if not rows:
@@ -117,7 +134,9 @@ def register_analytics_tools(mcp) -> None:
                 path = row["dimensionValues"][0]["value"]
                 views = int(row["metricValues"][0]["value"])
                 users = int(row["metricValues"][1]["value"])
-                lines.append(f"  {i:2}. {path}\n      Wyświetlenia: {views:,} | Użytkownicy: {users:,}")
+                lines.append(
+                    f"  {i:2}. {path}\n      Wyświetlenia: {views:,} | Użytkownicy: {users:,}"
+                )
 
             return "\n\n".join(lines)
         except Exception as e:
@@ -143,15 +162,23 @@ def register_analytics_tools(mcp) -> None:
         """
         try:
             service = get_google_service(account_id, "analyticsdata", "v1beta")
-            response = service.properties().runReport(
-                property=f"properties/{property_id}",
-                body={
-                    "dateRanges": [{"startDate": f"{days}daysAgo", "endDate": "today"}],
-                    "dimensions": [{"name": "sessionDefaultChannelGrouping"}],
-                    "metrics": [{"name": "sessions"}, {"name": "activeUsers"}],
-                    "orderBys": [{"metric": {"metricName": "sessions"}, "desc": True}],
-                },
-            ).execute()
+            response = (
+                service.properties()
+                .runReport(
+                    property=f"properties/{property_id}",
+                    body={
+                        "dateRanges": [
+                            {"startDate": f"{days}daysAgo", "endDate": "today"}
+                        ],
+                        "dimensions": [{"name": "sessionDefaultChannelGrouping"}],
+                        "metrics": [{"name": "sessions"}, {"name": "activeUsers"}],
+                        "orderBys": [
+                            {"metric": {"metricName": "sessions"}, "desc": True}
+                        ],
+                    },
+                )
+                .execute()
+            )
 
             rows = response.get("rows", [])
             if not rows:
