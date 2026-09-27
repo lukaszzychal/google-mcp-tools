@@ -168,6 +168,17 @@ Ensure the credentials file is in place:
 credentials/credentials.json   ← downloaded in step 2.4
 ```
 
+### Docker Option 🐳
+If you prefer not to set up a local Python environment, you can build a Docker image and run the server inside a container. Make sure to mount the `credentials` directory as a volume to persist your tokens across restarts.
+
+```bash
+# Build the image (from the project directory)
+docker build -t google-mcp-server .
+
+# Test the server (it should wait for stdio input)
+docker run -i -v $(pwd)/credentials:/app/credentials google-mcp-server
+```
+
 ---
 
 ## 4. Claude Desktop Integration

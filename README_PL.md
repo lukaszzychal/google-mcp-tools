@@ -168,6 +168,17 @@ Upewnij się, że plik credentials jest na miejscu:
 credentials/credentials.json   ← pobrany w kroku 2.4
 ```
 
+### Opcja z użyciem Dockera 🐳
+Jeśli nie chcesz konfigurować środowiska Python lokalnie, możesz zbudować obraz Dockera i uruchomić serwer w kontenerze. Zamontuj katalog `credentials` jako wolumen, aby zachować tokeny pomiędzy restartami.
+
+```bash
+# Zbuduj obraz (będąc w katalogu z projektem)
+docker build -t google-mcp-server .
+
+# Przetestuj działanie (powinien czekać na dane ze stdio)
+docker run -i -v $(pwd)/credentials:/app/credentials google-mcp-server
+```
+
 ---
 
 ## 4. Integracja z Claude Desktop
