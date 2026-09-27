@@ -1,5 +1,6 @@
 # 🔗 Google Multi-Account MCP Server
 
+**Autor:** [Łukasz Zychal](https://lukaszzychal.dev/) | [LinkedIn](https://www.linkedin.com/in/lukaszzychal/?isSelfProfile=true)
 Własny serwer **MCP (Model Context Protocol)** w Pythonie dający Claude i Gemini dostęp do wielu kont Google jednocześnie — bez zewnętrznych pośredników, w 100% prywatnie.
 
 **Obsługiwane usługi:** Gmail · Google Drive · Calendar · YouTube · Sheets · Analytics · AdSense · Fitness

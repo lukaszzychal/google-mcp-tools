@@ -1,6 +1,6 @@
 """
 server.py – Główny serwer MCP dla Google Multi-Account.
-
+Autor: Łukasz Zychal (https://lukaszzychal.dev/ | https://www.linkedin.com/in/lukaszzychal/)
 Uruchomienie:
     python server.py
 
