@@ -175,4 +175,4 @@ logger.info("✓ Zarejestrowano narzędzia Google AdSense")
 if __name__ == "__main__":
     logger.info(f"Uruchamianie {MCP_SERVER_NAME} v{MCP_SERVER_VERSION}...")
     logger.info("Serwer nasłuchuje na stdin/stdout (protokół MCP)")
-    mcp.run_stdio()
+    mcp.run()
