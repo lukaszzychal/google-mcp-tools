@@ -181,9 +181,40 @@ docker run -i -v $(pwd)/credentials:/app/credentials google-mcp-server
 
 ---
 
-## 4. Integracja z Claude Desktop
+## 4. Integracja z Claude
 
-### Krok 4.1 — Znajdź plik konfiguracyjny
+> **Dlaczego Claude w przeglądarce (claude.ai) nie ma dostępu do MCP?**  
+> Claude uruchomiony w przeglądarce działa **w chmurze** — nie ma wglądu do Twojego komputera. Ten serwer MCP działa **lokalnie**. Żeby Claude miał do niego dostęp, musisz użyć lokalnego klienta: **Claude Desktop** (aplikacja) lub **Claude Code CLI** (terminal).
+
+---
+
+### Opcja A — Claude Code CLI (terminal, analogicznie do Antigravity IDE)
+
+Claude Code CLI działa tak samo jak Antigravity IDE — uruchamia serwer MCP jako lokalny proces potomny.
+
+#### Instalacja
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+#### Rejestracja serwera MCP
+```bash
+claude mcp add --scope user google-multi-account -- \
+  /Users/TWOJA_NAZWA/mcp-servers/google-mcp-tools/venv/bin/python \
+  /Users/TWOJA_NAZWA/mcp-servers/google-mcp-tools/server.py
+```
+
+#### Uruchomienie
+```bash
+claude
+```
+Następnie w czacie zapytaj np. `"Wylistuj dostępne konta Google"` — narzędzia będą w pełni dostępne.
+
+---
+
+### Opcja B — Claude Desktop (aplikacja)
+
+#### Krok 4.1 — Znajdź plik konfiguracyjny
 
 | System | Ścieżka |
 |--------|---------|
@@ -192,11 +223,11 @@ docker run -i -v $(pwd)/credentials:/app/credentials google-mcp-server
 | **Linux** | `~/.config/claude/claude_desktop_config.json` |
 
 ```bash
-# macOS — otwórz plik w edytorze
+# macOS — otwórz folder w Finderze
 open ~/Library/Application\ Support/Claude/
 ```
 
-### Krok 4.2 — Dodaj konfigurację serwera
+#### Krok 4.2 — Dodaj konfigurację serwera
 
 Otwórz plik `claude_desktop_config.json` i dodaj (lub uzupełnij istniejący):
 
@@ -204,9 +235,9 @@ Otwórz plik `claude_desktop_config.json` i dodaj (lub uzupełnij istniejący):
 {
   "mcpServers": {
     "google-multi-account": {
-      "command": "/Users/TWOJA_NAZWA/PhpstormProjects/GoogleMCP/venv/bin/python",
+      "command": "/Users/TWOJA_NAZWA/mcp-servers/google-mcp-tools/venv/bin/python",
       "args": [
-        "/Users/TWOJA_NAZWA/PhpstormProjects/GoogleMCP/server.py"
+        "/Users/TWOJA_NAZWA/mcp-servers/google-mcp-tools/server.py"
       ]
     }
   }
@@ -217,19 +248,21 @@ Otwórz plik `claude_desktop_config.json` i dodaj (lub uzupełnij istniejący):
 
 Szybkie sprawdzenie ścieżki:
 ```bash
+cd /Users/TWOJA_NAZWA/mcp-servers/google-mcp-tools
 source venv/bin/activate
 which python
 # Skopiuj ten output do pola "command" w JSON powyżej
 ```
 
-### Krok 4.3 — Weryfikacja
+#### Krok 4.3 — Weryfikacja
 
-1. **Zrestartuj Claude Desktop** (zamknij całkowicie i otwórz ponownie)
-2. Otwórz nowy czat
+1. **Zrestartuj Claude Desktop całkowicie** (nie tylko zamknij okno — użyj Quit z paska menu)
+2. Otwórz **nowy** czat
 3. Szukaj ikony 🔨 (młotek/tools) w interfejsie
 4. Kliknij → powinna pojawić się lista narzędzi z `google-multi-account`
 5. Przetestuj: napisz do Claude:
-   > `"Wylistuj dostępne konta Google"`
+   > `"Jakie mam podłączone konta Google?"`  
+   Powinieneś dostać listę: `praca_dev`, `prywatne`, `prywatne2`, `publiczne`
 
 ---
 
